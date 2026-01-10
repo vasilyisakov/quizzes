@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Uploader - Upload to GitHub</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --primary: #2d5a4d;
+            --primary-light: #3d7a65;
+            --accent: #d4af37;
+            --bg: #fdfbf7;
+            --text: #2a2a2a;
+            --text-light: #6a6a6a;
+            --border: #e8e3d8;
+            --success: #5a8f7b;
+            --error: #c85a54;
+        }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 2rem 3rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.03) 10px,
+                rgba(255,255,255,0.03) 20px
+            );
+            pointer-events: none;
+        }
+        
+        h1 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 3rem;
+            font-weight: 400;
+            margin-bottom: 0.5rem;
+            position: relative;
+            letter-spacing: -0.02em;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 400;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: -2rem auto 0;
+            padding: 0 2rem 3rem;
+            position: relative;
+            flex: 1;
+        }
+        
+        .setup-notice {
+            background: #fff9e6;
+            border: 2px solid #ffd93d;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border-left: 6px solid var(--accent);
+        }
+        
+        .setup-notice h3 {
+            color: #b8860b;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .setup-notice p {
+            color: #8b7000;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .setup-notice code {
+            background: rgba(0,0,0,0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', monospace;
+            font-size: 0.9em;
+        }
+        
+        .setup-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 30px rgba(45, 90, 77, 0.08);
+            border: 2px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        
+        .setup-section h2 {
+            font-family: 'Instrument Serif', serif;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+        
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 0.9rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'DM Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+        
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(45, 90, 77, 0.1);
+        }
+        
+        .help-text {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 0.3rem;
+        }
+        
+        .help-text a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        
+        .help-text a:hover {
+            text-decoration: underline;
+        }
+        
+        .btn-save {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+        
+        .btn-save:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(45, 90, 77, 0.3);
+        }
+        
+        .upload-section {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            box-shadow: 0 8px 30px rgba(45, 90, 77, 0.08);
+            border: 2px solid var(--border);
+            margin-bottom: 2rem;
+        }
+        
+        .upload-section.disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        
+        .upload-area {
+            border: 3px dashed var(--border);
+            border-radius: 12px;
+            padding: 4rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            background: linear-gradient(135deg, #fdfbf7 0%, #faf8f3 100%);
+        }
+        
+        .upload-area:hover,
+        .upload-area.dragover {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #f8f6f0 0%, #f3f1eb 100%);
+            transform: translateY(-2px);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.6;
+        }
+        
+        .upload-text {
+            font-size: 1.3rem;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .upload-hint {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        .or-divider {
+            margin: 1.5rem 0;
+            text-align: center;
+            color: var(--text-light);
+            position: relative;
+        }
+        
+        .or-divider::before,
+        .or-divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background: var(--border);
+        }
+        
+        .or-divider::before { left: 0; }
+        .or-divider::after { right: 0; }
+        
+        .browse-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'DM Sans', sans-serif;
+        }
+        
+        .browse-btn:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(45, 90, 77, 0.3);
+        }
+        
+        input[type="file"] {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: linear-gradient(135deg, var(--accent) 0%, #c9a030 100%);
+            color: white;
+            border: none;
+            padding: 1.2rem 3rem;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            font-family: 'DM Sans', sans-serif;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+            margin-top: 1.5rem;
+        }
+        
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+        }
+        
+        .upload-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .file-list {
+            margin-top: 1.5rem;
+        }
+        
+        .file-item {
+            background: linear-gradient(135deg, #f8f6f0 0%, #f3f1eb 100%);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+            margin-bottom: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .file-name {
+            font-weight: 600;
+            color: var(--text);
+        }
+        
+        .file-remove {
+            background: none;
+            border: none;
+            color: var(--error);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.2rem 0.5rem;
+        }
+        
+        .status-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 30px rgba(45, 90, 77, 0.08);
+            border: 2px solid var(--border);
+            margin-bottom: 2rem;
+            display: none;
+        }
+        
+        .status-section.active {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .status-message {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .status-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        
+        .status-text {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .status-subtext {
+            color: var(--text-light);
+            font-size: 0.95rem;
+        }
+        
+        .success {
+            color: var(--success);
+        }
+        
+        .error {
+            color: var(--error);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .upload-section,
+            .setup-section,
+            .status-section {
+                padding: 2rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🚀 Quiz Uploader</h1>
+    <p class="subtitle">Upload Word quizzes directly to GitHub for automatic conversion</p>
+</header>
+
+<div class="container">
+    <!-- Setup Instructions -->
+    <div class="setup-notice">
+        <h3>⚙️ First Time Setup Required</h3>
+        <p>Before uploading, you need to configure your GitHub credentials below. Your token is stored locally in your browser (never sent to any server).</p>
+    </div>
+
+    <!-- Configuration Section -->
+    <div class="setup-section">
+        <h2>GitHub Configuration</h2>
+        
+        <div class="form-group">
+            <label for="githubUsername">GitHub Username</label>
+            <input type="text" id="githubUsername" placeholder="your-username">
+            <div class="help-text">Your GitHub username (e.g., "vasily-dev")</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="githubRepo">Repository Name</label>
+            <input type="text" id="githubRepo" value="quizzes">
+            <div class="help-text">The repository where quizzes are hosted</div>
+        </div>
+        
+        <div class="form-group">
+            <label for="githubToken">GitHub Personal Access Token</label>
+            <input type="password" id="githubToken" placeholder="ghp_xxxxxxxxxxxx">
+            <div class="help-text">
+                Create a token at <a href="https://github.com/settings/tokens/new" target="_blank">GitHub Settings</a> with <code>repo</code> permissions
+            </div>
+        </div>
+        
+        <button class="btn-save" onclick="saveConfig()">💾 Save Configuration</button>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="upload-section" id="uploadSection">
+        <h2 style="font-family: 'Instrument Serif', serif; font-size: 1.8rem; margin-bottom: 1.5rem; color: var(--primary);">Upload Quiz Files</h2>
+        
+        <div class="upload-area" id="dropZone">
+            <div class="upload-icon">📄</div>
+            <div class="upload-text">Drop your Word files here</div>
+            <div class="upload-hint">Supports .docx files from NotebookLM</div>
+        </div>
+        
+        <div class="or-divider">or</div>
+        
+        <div style="text-align: center;">
+            <button class="browse-btn" onclick="document.getElementById('fileInput').click()">
+                Browse Files
+            </button>
+            <input type="file" id="fileInput" accept=".docx" multiple onchange="handleFileSelect(event)">
+        </div>
+        
+        <div class="file-list" id="fileList"></div>
+        
+        <button class="upload-btn" id="uploadBtn" onclick="uploadFiles()" disabled>
+            ⬆️ Upload to GitHub
+        </button>
+    </div>
+
+    <!-- Status Section -->
+    <div class="status-section" id="statusSection">
+        <div class="status-message">
+            <div class="status-icon" id="statusIcon">⏳</div>
+            <div class="status-text" id="statusText">Uploading...</div>
+            <div class="status-subtext" id="statusSubtext">Please wait while files are uploaded to GitHub</div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <p>Files are uploaded to <code>quizzes_docx/</code> folder • GitHub Actions will automatically convert them to HTML</p>
+</footer>
+
+<script>
+    let selectedFiles = [];
+    let config = {
+        username: '',
+        repo: 'quizzes',
+        token: ''
+    };
+    
+    // Load saved config on page load
+    window.addEventListener('load', () => {
+        loadConfig();
+        checkSetupComplete();
+    });
+    
+    function saveConfig() {
+        config.username = document.getElementById('githubUsername').value.trim();
+        config.repo = document.getElementById('githubRepo').value.trim();
+        config.token = document.getElementById('githubToken').value.trim();
+        
+        if (!config.username || !config.token) {
+            alert('Please fill in both username and token');
+            return;
+        }
+        
+        // Save to localStorage
+        localStorage.setItem('github_config', JSON.stringify(config));
+        
+        alert('✅ Configuration saved!');
+        checkSetupComplete();
+    }
+    
+    function loadConfig() {
+        const saved = localStorage.getItem('github_config');
+        if (saved) {
+            config = JSON.parse(saved);
+            document.getElementById('githubUsername').value = config.username;
+            document.getElementById('githubRepo').value = config.repo;
+            document.getElementById('githubToken').value = config.token;
+        }
+    }
+    
+    function checkSetupComplete() {
+        const uploadSection = document.getElementById('uploadSection');
+        if (config.username && config.token) {
+            uploadSection.classList.remove('disabled');
+        } else {
+            uploadSection.classList.add('disabled');
+        }
+    }
+    
+    // Drag and drop
+    const dropZone = document.getElementById('dropZone');
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.add('dragover');
+        }, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.remove('dragover');
+        }, false);
+    });
+    
+    dropZone.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        addFiles(files);
+    }
+    
+    function handleFileSelect(e) {
+        const files = e.target.files;
+        addFiles(files);
+    }
+    
+    function addFiles(files) {
+        for (let file of files) {
+            if (!file.name.endsWith('.docx')) {
+                alert(`Skipping ${file.name} - only .docx files are supported`);
+                continue;
+            }
+            
+            // Check if already added
+            if (selectedFiles.find(f => f.name === file.name)) {
+                continue;
+            }
+            
+            selectedFiles.push(file);
+        }
+        
+        updateFileList();
+    }
+    
+    function removeFile(index) {
+        selectedFiles.splice(index, 1);
+        updateFileList();
+    }
+    
+    function updateFileList() {
+        const fileList = document.getElementById('fileList');
+        const uploadBtn = document.getElementById('uploadBtn');
+        
+        if (selectedFiles.length === 0) {
+            fileList.innerHTML = '';
+            uploadBtn.disabled = true;
+            return;
+        }
+        
+        fileList.innerHTML = '<h3 style="margin-bottom: 1rem; font-weight: 600;">Selected Files:</h3>';
+        
+        selectedFiles.forEach((file, index) => {
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <div class="file-name">📄 ${file.name}</div>
+                <button class="file-remove" onclick="removeFile(${index})">×</button>
+            `;
+            fileList.appendChild(fileItem);
+        });
+        
+        uploadBtn.disabled = false;
+    }
+    
+    async function uploadFiles() {
+        if (selectedFiles.length === 0) {
+            alert('Please select files first');
+            return;
+        }
+        
+        if (!config.username || !config.token) {
+            alert('Please configure GitHub credentials first');
+            return;
+        }
+        
+        // Show status section
+        document.getElementById('uploadSection').style.display = 'none';
+        document.getElementById('statusSection').classList.add('active');
+        
+        try {
+            for (let i = 0; i < selectedFiles.length; i++) {
+                const file = selectedFiles[i];
+                
+                updateStatus('⏳', `Uploading ${i + 1}/${selectedFiles.length}`, `Uploading ${file.name}...`);
+                
+                await uploadToGitHub(file);
+            }
+            
+            // Success
+            updateStatus('🎉', 'Upload Complete!', 
+                `${selectedFiles.length} file(s) uploaded successfully. GitHub Actions will convert them in ~2-3 minutes.`,
+                'success');
+            
+            setTimeout(() => {
+                resetUploader();
+            }, 5000);
+            
+        } catch (error) {
+            updateStatus('❌', 'Upload Failed', error.message, 'error');
+            
+            setTimeout(() => {
+                document.getElementById('statusSection').classList.remove('active');
+                document.getElementById('uploadSection').style.display = 'block';
+            }, 5000);
+        }
+    }
+    
+    async function uploadToGitHub(file) {
+        // Read file as base64
+        const base64Content = await fileToBase64(file);
+        
+        // GitHub API endpoint
+        const url = `https://api.github.com/repos/${config.username}/${config.repo}/contents/quizzes_docx/${file.name}`;
+        
+        // Create commit message
+        const message = `Upload quiz: ${file.name}`;
+        
+        // Prepare request
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${config.token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: message,
+                content: base64Content,
+                branch: 'main'
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Upload failed');
+        }
+        
+        return await response.json();
+    }
+    
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                // Remove data:*/*;base64, prefix
+                const base64 = reader.result.split(',')[1];
+                resolve(base64);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        });
+    }
+    
+    function updateStatus(icon, text, subtext, className = '') {
+        document.getElementById('statusIcon').textContent = icon;
+        document.getElementById('statusText').textContent = text;
+        document.getElementById('statusSubtext').textContent = subtext;
+        
+        const statusText = document.getElementById('statusText');
+        statusText.className = className;
+    }
+    
+    function resetUploader() {
+        selectedFiles = [];
+        document.getElementById('fileInput').value = '';
+        document.getElementById('fileList').innerHTML = '';
+        document.getElementById('uploadBtn').disabled = true;
+        
+        document.getElementById('statusSection').classList.remove('active');
+        document.getElementById('uploadSection').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
