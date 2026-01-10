@@ -25,16 +25,6 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y pandoc
-      
-      - name: Verify files exist
-        run: |
-          echo "Checking for quiz files..."
-          ls -la quizzes_docx/ || echo "quizzes_docx folder not found"
-          ls -la scripts/ || echo "scripts folder not found"
-          
-      - name: Make script executable
-        run: |
-          chmod +x scripts/quiz_converter.py
           
       - name: Convert quizzes
         run: |
@@ -44,19 +34,23 @@ jobs:
             exit 0
           fi
           
-          # Convert all .docx files in quizzes_docx folder
-          for docx_file in quizzes_docx/*.docx; do
+          # Change to quizzes_docx directory to run conversion there
+          cd quizzes_docx
+          
+          # Convert all .docx files
+          for docx_file in *.docx; do
             if [ -f "$docx_file" ]; then
               echo "Converting $docx_file..."
-              python3 scripts/quiz_converter.py "$docx_file"
+              python3 ../scripts/quiz_converter.py "$docx_file"
               
-              # Move HTML to root for GitHub Pages
-              filename=$(basename "$docx_file" .docx)
-              if [ -f "${filename}.html" ]; then
-                mv "${filename}.html" .
-                echo "✅ Created ${filename}.html"
+              # Check if HTML was created
+              filename="${docx_file%.docx}.html"
+              if [ -f "$filename" ]; then
+                echo "✅ Created $filename"
+                # Move to repository root
+                mv "$filename" ../ 
               else
-                echo "⚠️ Warning: ${filename}.html was not created"
+                echo "⚠️ Warning: $filename was not created"
               fi
             fi
           done
@@ -66,7 +60,7 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          # Add all HTML files
+          # Add all HTML files in root
           git add *.html 2>/dev/null || echo "No HTML files to add"
           
           # Check if there are changes to commit
