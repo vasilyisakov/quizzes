@@ -26,22 +26,37 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pandoc
       
+      - name: Verify files exist
+        run: |
+          echo "Checking for quiz files..."
+          ls -la quizzes_docx/ || echo "quizzes_docx folder not found"
+          ls -la scripts/ || echo "scripts folder not found"
+          
+      - name: Make script executable
+        run: |
+          chmod +x scripts/quiz_converter.py
+          
       - name: Convert quizzes
         run: |
-          # Create output directory if it doesn't exist
-          mkdir -p converted_quizzes
+          # Check if there are any .docx files
+          if ! ls quizzes_docx/*.docx 1> /dev/null 2>&1; then
+            echo "No .docx files found in quizzes_docx/"
+            exit 0
+          fi
           
           # Convert all .docx files in quizzes_docx folder
           for docx_file in quizzes_docx/*.docx; do
             if [ -f "$docx_file" ]; then
               echo "Converting $docx_file..."
-              python scripts/quiz_converter.py "$docx_file"
+              python3 scripts/quiz_converter.py "$docx_file"
               
               # Move HTML to root for GitHub Pages
               filename=$(basename "$docx_file" .docx)
               if [ -f "${filename}.html" ]; then
                 mv "${filename}.html" .
                 echo "✅ Created ${filename}.html"
+              else
+                echo "⚠️ Warning: ${filename}.html was not created"
               fi
             fi
           done
@@ -51,6 +66,13 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          git add *.html
-          git diff --staged --quiet || git commit -m "Auto-convert quizzes from .docx files"
-          git push
+          # Add all HTML files
+          git add *.html 2>/dev/null || echo "No HTML files to add"
+          
+          # Check if there are changes to commit
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Auto-convert quizzes from .docx files [skip ci]"
+            git push
+          fi
