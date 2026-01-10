@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quizzes - Interactive Learning</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+            padding: 30px 15px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+        h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        .quiz-grid {
+            display: grid;
+            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        .quiz-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+        .quiz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        .quiz-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        .quiz-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        .quiz-description {
+            font-size: 15px;
+            color: #718096;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .quiz-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 13px;
+            color: #a0aec0;
+        }
+        .quiz-meta span {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-start {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+        .btn-start:hover {
+            opacity: 0.9;
+        }
+        footer {
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+
+        /* Coming Soon Badge */
+        .coming-soon {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        .badge {
+            display: inline-block;
+            background: #fbbf24;
+            color: #78350f;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+            .quiz-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>📚 Interactive Quizzes</h1>
+        <p class="subtitle">Test your knowledge with engaging, interactive quizzes</p>
+    </header>
+
+    <div class="quiz-grid">
+        <!-- Active Quiz -->
+        <a href="graph-trends-quiz.html" class="quiz-card">
+            <div class="quiz-icon">📊</div>
+            <h2 class="quiz-title">Graph Trends Vocabulary</h2>
+            <p class="quiz-description">
+                Master the terminology used to describe data trends, patterns, and changes in graphs and visualizations.
+            </p>
+            <div class="quiz-meta">
+                <span>⏱️ ~5 minutes</span>
+                <span>❓ 10 questions</span>
+            </div>
+            <button class="btn-start">Start Quiz →</button>
+        </a>
+
+        <!-- Placeholder for future quizzes -->
+        <div class="quiz-card coming-soon">
+            <span class="badge">Coming Soon</span>
+            <div class="quiz-icon">🍬</div>
+            <h2 class="quiz-title">Alternative Sweeteners</h2>
+            <p class="quiz-description">
+                Test your knowledge of natural and artificial sweeteners, their properties, and applications in food science.
+            </p>
+            <div class="quiz-meta">
+                <span>⏱️ ~7 minutes</span>
+                <span>❓ 15 questions</span>
+            </div>
+            <button class="btn-start">Coming Soon</button>
+        </div>
+
+        <div class="quiz-card coming-soon">
+            <span class="badge">Coming Soon</span>
+            <div class="quiz-icon">🧬</div>
+            <h2 class="quiz-title">MASLD Basics</h2>
+            <p class="quiz-description">
+                Learn the fundamentals of Metabolic Dysfunction-Associated Steatotic Liver Disease and related metabolic conditions.
+            </p>
+            <div class="quiz-meta">
+                <span>⏱️ ~10 minutes</span>
+                <span>❓ 20 questions</span>
+            </div>
+            <button class="btn-start">Coming Soon</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Built with ❤️ for better learning</p>
+    </footer>
+</div>
+
+</body>
+</html>

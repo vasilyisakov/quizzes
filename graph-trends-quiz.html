@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graph Trends Vocabulary Quiz</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 15px;
+        }
+        .app-container { 
+            background: white;
+            width: 100%;
+            max-width: 650px;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        h1 { 
+            color: #2d3748;
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .subtitle {
+            color: #718096;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        .question-text { 
+            font-size: 18px;
+            margin-bottom: 25px;
+            color: #2d3748;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+        .options-grid { 
+            display: grid;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        button { 
+            padding: 14px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 2px solid #e2e8f0;
+            background: white;
+            border-radius: 10px;
+            transition: all 0.2s ease;
+            color: #2d3748;
+            font-weight: 500;
+            text-align: left;
+        }
+        button:hover:not(:disabled) { 
+            background-color: #f7fafc;
+            border-color: #cbd5e0;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        
+        /* State Classes */
+        .correct { 
+            background-color: #c6f6d5 !important;
+            border-color: #68d391 !important;
+            color: #22543d !important;
+        }
+        .wrong { 
+            background-color: #fed7d7 !important;
+            border-color: #fc8181 !important;
+            color: #742a2a !important;
+        }
+        .hidden { display: none; }
+        
+        #next-btn { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            margin-top: 20px;
+            font-weight: 600;
+            width: 100%;
+            padding: 16px;
+            font-size: 17px;
+        }
+        #next-btn:hover { 
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Hint Styles */
+        #hint-btn { 
+            background-color: #fef5e7;
+            border-color: #f9e79f;
+            color: #7d6608;
+            font-size: 14px;
+            padding: 10px 18px;
+            margin-bottom: 20px;
+            display: inline-block;
+            text-align: center;
+        }
+        #hint-btn:hover { 
+            background-color: #fdeaa6;
+        }
+        #hint-text { 
+            background-color: #fffbf0;
+            border-left: 4px solid #f9c74f;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #5a5a5a;
+            text-align: left;
+            border-radius: 6px;
+            line-height: 1.5;
+        }
+
+        /* Progress Bar */
+        .progress-container { 
+            width: 100%;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            height: 10px;
+            overflow: hidden;
+        }
+        .progress-bar { 
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.4s ease;
+        }
+        
+        /* Progress Text */
+        #progress-text {
+            font-size: 14px;
+            color: #718096;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        /* Feedback */
+        #feedback {
+            min-height: 28px;
+            font-weight: 600;
+            margin-top: 15px;
+            font-size: 16px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .feedback-correct {
+            background-color: #c6f6d5;
+            color: #22543d;
+        }
+        .feedback-wrong {
+            background-color: #fed7d7;
+            color: #742a2a;
+        }
+        
+        /* Submit Button */
+        .submit-btn { 
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+            margin-top: 20px;
+            padding: 16px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .submit-btn:hover { 
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Form Inputs */
+        input[type=text] { 
+            padding: 14px;
+            margin-bottom: 15px;
+            width: 100%;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.2s;
+        }
+        input[type=text]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Results */
+        .score-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: #667eea;
+            margin: 20px 0;
+        }
+        .results-message {
+            font-size: 18px;
+            color: #4a5568;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        /* Restart Button */
+        .restart-btn {
+            background: #f7fafc;
+            color: #4a5568;
+            border: 2px solid #e2e8f0;
+            padding: 12px 24px;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+        .restart-btn:hover {
+            background: #edf2f7;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 480px) {
+            .app-container {
+                padding: 25px 20px;
+            }
+            h1 {
+                font-size: 24px;
+            }
+            .question-text {
+                font-size: 16px;
+            }
+            button {
+                padding: 12px 16px;
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <div id="quiz-box">
+        <h1>📊 Graph Trends Vocabulary Quiz</h1>
+        <p class="subtitle">Test your knowledge of data visualization terminology</p>
+        
+        <div class="progress-container"><div class="progress-bar" id="progress-bar"></div></div>
+        <p id="progress-text">Question 1 of 10</p>
+        
+        <p class="question-text" id="question">Loading...</p>
+        
+        <button id="hint-btn" onclick="toggleHint()">💡 Show Hint</button>
+        <div id="hint-text" class="hidden"></div>
+        
+        <div class="options-grid" id="options"></div>
+        
+        <div id="feedback"></div>
+        
+        <button id="next-btn" class="hidden" onclick="nextQuestion()">Next Question →</button>
+    </div>
+
+    <div id="result-box" class="hidden">
+        <h1>🎉 Quiz Complete!</h1>
+        
+        <div class="score-display" id="score-display"></div>
+        <p class="results-message">Great job completing the quiz!</p>
+        
+        <p style="font-size:15px; color:#718096; margin-bottom:20px;">
+            Enter your name to submit your results:
+        </p>
+        
+        <form action="https://formsubmit.co/lena.lubnina@gmail.com" method="POST">
+            <input type="hidden" name="_subject" value="New Graph Trends Quiz Submission!">
+            <input type="hidden" name="_captcha" value="false">
+            <input type="hidden" name="_template" value="table">
+            
+            <input type="text" name="Student Name" placeholder="Your Name" required>
+            <input type="hidden" name="Final Score" id="input-score">
+            <input type="hidden" name="Questions Wrong" id="input-wrong">
+            <input type="hidden" name="Hints Used On" id="input-hints">
+            <input type="hidden" name="Completion Time" id="input-time">
+            
+            <button type="submit" class="submit-btn">📤 Submit Results</button>
+        </form>
+        
+        <button onclick="location.reload()" class="restart-btn">🔄 Restart Quiz</button>
+    </div>
+</div>
+
+<script>
+    const quizData = [
+        { 
+            q: "If a value on a graph goes up and down repeatedly over a period, the best term to describe this movement is that it ___________.", 
+            options: ["stabilises", "fluctuates", "bottoms out", "peaks"], 
+            answer: 1, 
+            hint: "Consider the term for a value that shows frequent and irregular changes in direction." 
+        },
+        { 
+            q: "To describe a change that happens very quickly and intensely, you would say it changed ___________.", 
+            options: ["gradually", "steadily", "sharply", "moderately"], 
+            answer: 2, 
+            hint: "Think of an adverb that conveys both speed and a steep angle on a line graph." 
+        },
+        { 
+            q: "The data shows 'a ___________ increase in sales.' Which adjective would you use to describe a very large and important increase?", 
+            options: ["steady", "slight", "stable", "significant"], 
+            answer: 3, 
+            hint: "Which word from the list means 'considerable' or 'substantial'?" 
+        },
+        { 
+            q: "After a period of rapid decline, the number of cases finally stopped falling and ___________ at 100 per day.", 
+            options: ["plummeted", "levelled off", "peaked", "shot up"], 
+            answer: 1, 
+            hint: "Look for a phrase that means a value becomes flat or stable after a period of change." 
+        },
+        { 
+            q: "The graph shows that the company's profits are ___________ to reach a new high by the end of the year.", 
+            options: ["witnessed", "revealed", "peaked", "projected"], 
+            answer: 3, 
+            hint: "Which word is most appropriate for making a forecast about future data trends?" 
+        },
+        { 
+            q: "The Prime Minister's approval rating ___________ to just 20% after the scandal, its lowest point ever.", 
+            options: ["climbed", "stabilized", "soared", "plunged"], 
+            answer: 3, 
+            hint: "Select a verb that means to fall very quickly and suddenly." 
+        },
+        { 
+            q: "An alternative way to say 'Sales increased significantly in 2020' is: 'The year 2020 ___________ a significant increase in sales.'", 
+            options: ["peaked", "fluctuated", "saw", "declined"], 
+            answer: 2, 
+            hint: "Think of a verb that allows a period of time (like a year) to be the subject of the sentence describing a change." 
+        },
+        { 
+            q: "There was a ___________ in the number of attendees, from 100 in the first hour to 105 in the second.", 
+            options: ["sharp rise", "dramatic fall", "slight increase", "considerable drop"], 
+            answer: 2, 
+            hint: "Consider both the direction (increase) and the magnitude (small) of the change." 
+        },
+        { 
+            q: "What ___________ in the table is the dominance of one company in the market share over the five-year period.", 
+            options: ["levels off", "falls", "is likely to", "stands out"], 
+            answer: 3, 
+            hint: "You need a phrase that means 'What is most noticeable or striking...'" 
+        },
+        { 
+            q: "The production of vinyl records ___________ in 1995, after which it began to rise again due to a resurgence in popularity.", 
+            options: ["reached a peak", "rocketed", "bottomed out", "remained stable"], 
+            answer: 2, 
+            hint: "Look for the expression used to describe a trend hitting its lowest point before it stops falling." 
+        }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let hintsUsed = [];
+    let wrongAnswers = [];
+    let startTime = Date.now();
+
+    // Elements
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const progressText = document.getElementById("progress-text");
+    const progressBar = document.getElementById("progress-bar");
+    const feedbackEl = document.getElementById("feedback");
+    const nextBtn = document.getElementById("next-btn");
+    const quizBox = document.getElementById("quiz-box");
+    const resultBox = document.getElementById("result-box");
+    const hintBtn = document.getElementById("hint-btn");
+    const hintText = document.getElementById("hint-text");
+
+    // Form Inputs
+    const inputScore = document.getElementById("input-score");
+    const inputWrong = document.getElementById("input-wrong");
+    const inputHints = document.getElementById("input-hints");
+    const inputTime = document.getElementById("input-time");
+    const scoreDisplay = document.getElementById("score-display");
+
+    function loadQuestion() {
+        const currentData = quizData[currentIdx];
+        questionEl.textContent = currentData.q;
+        progressText.textContent = `Question ${currentIdx + 1} of ${quizData.length}`;
+        
+        // Reset hint
+        hintText.classList.add("hidden");
+        hintText.textContent = currentData.hint;
+        hintBtn.textContent = "💡 Show Hint";
+        hintBtn.style.display = "inline-block";
+        
+        // Update progress bar
+        const progressPercent = (currentIdx / quizData.length) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+        
+        // Clear previous state
+        optionsEl.innerHTML = "";
+        feedbackEl.textContent = "";
+        feedbackEl.className = "";
+        nextBtn.classList.add("hidden");
+
+        // Create option buttons
+        currentData.options.forEach((opt, index) => {
+            const btn = document.createElement("button");
+            btn.textContent = opt;
+            btn.onclick = () => checkAnswer(index, btn);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    function toggleHint() {
+        if (hintText.classList.contains("hidden")) {
+            hintText.classList.remove("hidden");
+            hintBtn.textContent = "🙈 Hide Hint";
+            const qNum = currentIdx + 1;
+            if (!hintsUsed.includes(qNum)) {
+                hintsUsed.push(qNum);
+            }
+        } else {
+            hintText.classList.add("hidden");
+            hintBtn.textContent = "💡 Show Hint";
+        }
+    }
+
+    function checkAnswer(selectedIndex, btnElement) {
+        const currentData = quizData[currentIdx];
+        const buttons = optionsEl.querySelectorAll("button");
+        
+        // Disable all buttons
+        buttons.forEach(btn => btn.disabled = true);
+
+        if (selectedIndex === currentData.answer) {
+            btnElement.classList.add("correct");
+            feedbackEl.textContent = "✅ Correct! Well done!";
+            feedbackEl.className = "feedback-correct";
+            score++;
+        } else {
+            btnElement.classList.add("wrong");
+            feedbackEl.textContent = "❌ Incorrect. The correct answer is highlighted.";
+            feedbackEl.className = "feedback-wrong";
+            buttons[currentData.answer].classList.add("correct");
+            wrongAnswers.push(currentIdx + 1);
+        }
+        
+        nextBtn.classList.remove("hidden");
+    }
+
+    function nextQuestion() {
+        currentIdx++;
+        if (currentIdx < quizData.length) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        quizBox.classList.add("hidden");
+        resultBox.classList.remove("hidden");
+        
+        const percentage = Math.round((score / quizData.length) * 100);
+        scoreDisplay.textContent = `${score} / ${quizData.length}`;
+        
+        // Calculate completion time
+        const timeElapsed = Math.round((Date.now() - startTime) / 1000);
+        const minutes = Math.floor(timeElapsed / 60);
+        const seconds = timeElapsed % 60;
+        const timeString = `${minutes}m ${seconds}s`;
+
+        // Populate hidden form fields
+        inputScore.value = `${score} / ${quizData.length} (${percentage}%)`;
+        inputWrong.value = wrongAnswers.length > 0 ? wrongAnswers.join(", ") : "None";
+        inputHints.value = hintsUsed.length > 0 ? hintsUsed.join(", ") : "None";
+        inputTime.value = timeString;
+    }
+
+    // Initialize quiz
+    loadQuestion();
+</script>
+
+</body>
+</html>
