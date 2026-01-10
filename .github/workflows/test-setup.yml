@@ -1,0 +1,49 @@
+name: Test Setup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Check directory structure
+        run: |
+          echo "=== Repository Structure ==="
+          ls -la
+          echo ""
+          echo "=== .github/workflows ==="
+          ls -la .github/workflows/ || echo "No .github/workflows folder"
+          echo ""
+          echo "=== scripts folder ==="
+          ls -la scripts/ || echo "No scripts folder"
+          echo ""
+          echo "=== quizzes_docx folder ==="
+          ls -la quizzes_docx/ || echo "No quizzes_docx folder"
+          echo ""
+          echo "=== Looking for .docx files ==="
+          find . -name "*.docx" || echo "No .docx files found"
+      
+      - name: Test Python
+        run: |
+          python3 --version
+          which python3
+      
+      - name: Test Pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
+          pandoc --version
+      
+      - name: Check if converter script exists
+        run: |
+          if [ -f "scripts/quiz_converter.py" ]; then
+            echo "✅ scripts/quiz_converter.py exists"
+            cat scripts/quiz_converter.py
+          else
+            echo "❌ scripts/quiz_converter.py NOT FOUND"
+          fi
